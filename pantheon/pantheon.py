@@ -22,7 +22,7 @@ class Pantheon():
     TOURNAMENT_REGIONS = ["americas"]
     
     
-    def __init__(self, server, api_key, errorHandling = False, requestsLoggingFunction = None, debug=False):
+    def __init__(self, server, server_2, api_key, errorHandling = False, requestsLoggingFunction = None, debug=False):
         """
         Initialize an instance of Pantheon class
         
@@ -34,6 +34,7 @@ class Pantheon():
         """
         self._key = api_key
         self._server = server
+        self._server_2 = server_2  # for match-v5
         self._rl = RateLimiterManager(debug)
         
         self.errorHandling = errorHandling
@@ -357,7 +358,7 @@ class Pantheon():
         
         Returns the result of https://developer.riotgames.com/api-methods/#match-v4/GET_getMatch
         """
-        return await self.fetch((self.BASE_URL_LOL + "match/v4/matches/{matchId}").format(server=self._server, matchId=matchId))
+        return await self.fetch((self.BASE_URL_LOL + "match/v5/matches/{matchId}").format(server=self._server_2, matchId=matchId))
         
     
     @errorHandler
@@ -369,20 +370,20 @@ class Pantheon():
         
         Returns the result of https://developer.riotgames.com/api-methods/#match-v4/GET_getMatchTimeline
         """
-        return await self.fetch((self.BASE_URL_LOL + "match/v4/timelines/by-match/{matchId}").format(server=self._server, matchId=matchId))
+        return await self.fetch((self.BASE_URL_LOL + "match/v5/matches/{matchId}/timeline").format(server=self._server_2, matchId=matchId))
     
     
     @errorHandler
     @exceptions
     @ratelimit
-    async def getMatchlist(self, accountId, params=None):
+    async def getMatchlist(self, puuid, params=None):
         """
         :param string accountId: accountId of the player
         :param object params: all key:value params to add to the request
         
         Returns the result of https://developer.riotgames.com/api-methods/#match-v4/GET_getMatchlist
         """
-        return await self.fetch((self.BASE_URL_LOL + "match/v4/matchlists/by-account/{accountId}{params}").format(server=self._server, accountId=accountId, params = utils.urlParams(params)))
+        return await self.fetch((self.BASE_URL_LOL + "match/v5/matches/by-puuid/{puuid}/ids{params}").format(server=self._server_2, puuid=puuid, params = utils.urlParams(params)))
 
 
     @errorHandler
